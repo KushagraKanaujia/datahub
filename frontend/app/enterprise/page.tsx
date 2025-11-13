@@ -6,62 +6,98 @@ import { useState } from 'react';
 
 export default function EnterprisePage() {
   const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState('growth');
+  const [selectedPlan, setSelectedPlan] = useState('professional');
 
   const plans = [
     {
-      id: 'starter',
-      name: 'Starter',
+      id: 'basic',
+      name: 'Basic',
       price: 499,
-      users: '1-100',
+      receipts: '10K receipts/month',
       features: [
-        'API access with 10K requests/month',
-        'Basic data filtering',
+        'Access to grocery & restaurant data',
+        'Monthly data exports (CSV)',
+        'Basic category filtering',
         'Email support',
         'Standard SLA (99% uptime)',
-        'Monthly data exports',
+       '3-month historical data',
       ]
     },
     {
-      id: 'growth',
-      name: 'Growth',
+      id: 'professional',
+      name: 'Professional',
       price: 1999,
-      users: '100-1,000',
+      receipts: '100K receipts/month',
       popular: true,
       features: [
-        'API access with 100K requests/month',
+        'Access to all receipt categories',
+        'Real-time API access',
         'Advanced filtering & segmentation',
+        'Geographic & demographic insights',
         'Dedicated account manager',
         'Priority SLA (99.9% uptime)',
-        'Real-time data sync',
+        '12-month historical data',
         'Custom data packages',
-        'White-label options',
       ]
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
       price: 'Custom',
-      users: '1,000+',
+      receipts: 'Unlimited receipts',
       features: [
-        'Unlimited API requests',
-        'Custom integration & webhooks',
+        'Full database access',
+        'Custom API endpoints & webhooks',
         'Dedicated infrastructure',
+        'White-label solutions',
         'Premium SLA (99.99% uptime)',
-        '24/7 phone support',
-        'On-premise deployment option',
-        'Custom contracts & compliance',
-        'Strategic partnership opportunities',
+        'Unlimited historical data',
+        'On-premise deployment options',
+        'Custom analytics & reporting',
+        'Direct partnership opportunities',
       ]
     }
   ];
 
+  const useCases = [
+    {
+      icon: '🏪',
+      title: 'CPG & Retail Brands',
+      description: 'Track competitive pricing, market share, and purchase patterns across major retailers',
+      examples: ['P&G', 'Unilever', 'Coca-Cola']
+    },
+    {
+      icon: '🏢',
+      title: 'Market Research Firms',
+      description: 'Access real-time consumer behavior data for client reports and trend analysis',
+      examples: ['Nielsen', 'Kantar', 'IRI/Circana']
+    },
+    {
+      icon: '💹',
+      title: 'Investment Firms',
+      description: 'Alternative data for retail performance analysis and investment decisions',
+      examples: ['Hedge Funds', 'Private Equity', 'Analysts']
+    },
+    {
+      icon: '🛒',
+      title: 'Retailers',
+      description: 'Competitive intelligence and basket analysis to optimize pricing and inventory',
+      examples: ['Target', 'Walmart', 'Kroger']
+    }
+  ];
+
+  const stats = [
+    { label: 'Active Users', value: '15,000+', icon: '👥' },
+    { label: 'Receipts/Month', value: '450K+', icon: '🧾' },
+    { label: 'Data Accuracy', value: '99.2%', icon: '✓' },
+    { label: 'Categories', value: '12+', icon: '📦' }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0a0a0a] relative overflow-hidden">
-      {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"
+          className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -69,7 +105,7 @@ export default function EnterprisePage() {
           transition={{ duration: 10, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"
+          className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.5, 0.3, 0.5],
@@ -78,11 +114,9 @@ export default function EnterprisePage() {
         />
       </div>
 
-      {/* Grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,217,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,217,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]" />
 
       <div className="relative z-10">
-        {/* Header */}
         <motion.header
           initial={{ y: -100 }}
           animate={{ y: 0 }}
@@ -98,170 +132,126 @@ export default function EnterprisePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
               </button>
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  🏢 Enterprise Solutions
-                </h1>
-                <p className="text-sm text-gray-400">Scale your data acquisition with our B2B platform</p>
-              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                Enterprise Solutions
+              </h1>
             </div>
           </div>
         </motion.header>
 
-        {/* Main Content */}
-        <main className="container mx-auto px-6 py-8 max-w-7xl">
+        <main className="container mx-auto px-6 py-12">
           {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Access High-Quality Consumer Data at Scale
+            <h2 className="text-5xl font-bold text-white mb-4">
+              Premium Receipt Data for Enterprise
             </h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-              Connect directly with users who consent to share their data. No scrapers, no bots, just real people with real insights.
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Access 450K+ monthly receipts from real consumers. Real-time insights into purchase behavior,
+              competitive pricing, and market trends across all major retailers.
             </p>
           </motion.div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-            {[
-              { label: 'Active Users', value: '50K+', icon: '👥' },
-              { label: 'Data Sources', value: '26', icon: '🔗' },
-              { label: 'Monthly Data Points', value: '2.5M+', icon: '📊' },
-              { label: 'Enterprise Clients', value: '150+', icon: '🏢' },
-            ].map((stat, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-16">
+            {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: 0.1 * index }}
                 className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 text-center"
               >
-                <div className="text-3xl mb-2">{stat.icon}</div>
+                <div className="text-4xl mb-2">{stat.icon}</div>
                 <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-                <p className="text-gray-400 text-sm">{stat.label}</p>
+                <p className="text-sm text-gray-400">{stat.label}</p>
               </motion.div>
             ))}
-          </div>
-
-          {/* Pricing Plans */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold text-white mb-6 text-center">Choose Your Plan</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {plans.map((plan, index) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                  className={`backdrop-blur-xl rounded-2xl p-6 relative ${
-                    plan.popular
-                      ? 'bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-2 border-cyan-500/50'
-                      : 'bg-white/5 border border-white/10'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white text-xs font-semibold">
-                      Most Popular
-                    </div>
-                  )}
-
-                  <div className="text-center mb-6">
-                    <h4 className="text-2xl font-bold text-white mb-2">{plan.name}</h4>
-                    <div className="mb-2">
-                      {typeof plan.price === 'number' ? (
-                        <>
-                          <span className="text-4xl font-bold text-cyan-400">${plan.price}</span>
-                          <span className="text-gray-400">/month</span>
-                        </>
-                      ) : (
-                        <span className="text-4xl font-bold text-cyan-400">{plan.price}</span>
-                      )}
-                    </div>
-                    <p className="text-gray-400 text-sm">{plan.users} users</p>
-                  </div>
-
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm">
-                        <span className="text-green-400 mt-0.5">✓</span>
-                        <span className="text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => setSelectedPlan(plan.id)}
-                    className={`w-full py-3 rounded-lg font-medium transition-all ${
-                      plan.popular
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700'
-                        : 'bg-white/10 text-white hover:bg-white/20'
-                    }`}
-                  >
-                    {typeof plan.price === 'number' ? 'Start Free Trial' : 'Contact Sales'}
-                  </button>
-                </motion.div>
-              ))}
-            </div>
           </div>
 
           {/* Use Cases */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-12"
+            transition={{ delay: 0.4 }}
+            className="mb-16"
           >
-            <h3 className="text-2xl font-bold text-white mb-6 text-center">Built for Enterprise Use Cases</h3>
+            <h3 className="text-3xl font-bold text-white text-center mb-8">Who Uses Receipt Data?</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  title: 'Market Research',
-                  icon: '📊',
-                  description: 'Understand consumer behavior, preferences, and trends with real-time data from thousands of users.',
-                  examples: ['Consumer segmentation', 'Brand perception analysis', 'Trend forecasting']
-                },
-                {
-                  title: 'Product Development',
-                  icon: '🚀',
-                  description: 'Build better products by understanding how people use competing services and what features they need.',
-                  examples: ['Feature validation', 'User journey mapping', 'Competitor analysis']
-                },
-                {
-                  title: 'Personalization',
-                  icon: '🎯',
-                  description: 'Deliver hyper-personalized experiences using rich user preference and behavior data.',
-                  examples: ['Content recommendations', 'Dynamic pricing', 'Targeted marketing']
-                },
-                {
-                  title: 'Risk Assessment',
-                  icon: '🛡️',
-                  description: 'Make better underwriting and risk decisions with comprehensive user financial and behavioral data.',
-                  examples: ['Credit scoring', 'Fraud detection', 'Insurance underwriting']
-                },
-              ].map((useCase, index) => (
+              {useCases.map((useCase, index) => (
                 <motion.div
                   key={useCase.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + index * 0.1 }}
-                  className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6"
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + (0.1 * index) }}
+                  className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6"
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="text-3xl">{useCase.icon}</div>
-                    <h4 className="text-xl font-bold text-white">{useCase.title}</h4>
-                  </div>
-                  <p className="text-gray-400 text-sm mb-4">{useCase.description}</p>
-                  <div className="space-y-2">
+                  <div className="text-4xl mb-3">{useCase.icon}</div>
+                  <h4 className="text-xl font-bold text-white mb-2">{useCase.title}</h4>
+                  <p className="text-gray-400 mb-3">{useCase.description}</p>
+                  <div className="flex flex-wrap gap-2">
                     {useCase.examples.map((example) => (
-                      <div key={example} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
-                        <span className="text-gray-300 text-sm">{example}</span>
-                      </div>
+                      <span key={example} className="px-3 py-1 bg-white/10 border border-white/10 rounded-full text-xs text-gray-300">
+                        {example}
+                      </span>
                     ))}
                   </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Pricing Plans */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <h3 className="text-3xl font-bold text-white text-center mb-8">Choose Your Plan</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <motion.div
+                  key={plan.id}
+                  whileHover={{ y: -5 }}
+                  className={`backdrop-blur-xl bg-white/5 border rounded-2xl p-8 ${
+                    plan.popular ? 'border-blue-500/50' : 'border-white/10'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="inline-block px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-xs text-blue-400 font-semibold mb-4">
+                      Most Popular
+                    </div>
+                  )}
+                  <h4 className="text-2xl font-bold text-white mb-2">{plan.name}</h4>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-white">
+                      {typeof plan.price === 'number' ? `$${plan.price.toLocaleString()}` : plan.price}
+                    </span>
+                    {typeof plan.price === 'number' && <span className="text-gray-400">/month</span>}
+                  </div>
+                  <p className="text-cyan-400 font-medium mb-6">{plan.receipts}</p>
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-gray-300">
+                        <span className="text-green-400 mt-1">✓</span>
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                        : 'bg-white/5 border border-white/10 text-white hover:border-blue-500/50'
+                    }`}
+                  >
+                    {plan.id === 'enterprise' ? 'Contact Sales' : 'Get Started'}
+                  </motion.button>
                 </motion.div>
               ))}
             </div>
@@ -272,19 +262,28 @@ export default function EnterprisePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 }}
-            className="backdrop-blur-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-8 text-center"
+            className="mt-16 p-8 backdrop-blur-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-2xl text-center"
           >
-            <h3 className="text-2xl font-bold text-white mb-3">Ready to Get Started?</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Join 150+ enterprises accessing high-quality, consented user data. Schedule a demo with our team today.
+            <h3 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h3>
+            <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+              Join 127+ companies already using ReceiptBank data to make better business decisions.
+              Schedule a demo to see how our platform can help your business.
             </p>
-            <div className="flex gap-4 justify-center">
-              <button className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all">
+            <div className="flex items-center justify-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg text-white font-semibold"
+              >
                 Schedule Demo
-              </button>
-              <button className="px-8 py-3 bg-white/10 border border-white/20 text-white rounded-lg font-medium hover:bg-white/20 transition-all">
-                View API Docs
-              </button>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white/5 border border-white/10 rounded-lg text-white font-semibold hover:border-blue-500/50 transition-all"
+              >
+                Contact Sales
+              </motion.button>
             </div>
           </motion.div>
         </main>

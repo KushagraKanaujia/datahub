@@ -3,153 +3,103 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '@/lib/api';
-import DataModal from '@/components/DataModal';
 
-// Service card component with stunning visuals
-const ServiceCard = ({
-  name,
-  icon,
-  description,
-  isConnected,
-  color,
-  demand,
-  onConnect,
-  onDisconnect,
-  onSync
-}: any) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const demandConfig = {
-    'Very High': { color: '#10b981', bg: 'bg-green-500/20', border: 'border-green-500/30', text: 'text-green-400', label: '🔥 Very High Demand' },
-    'High': { color: '#0ea5e9', bg: 'bg-blue-500/20', border: 'border-blue-500/30', text: 'text-blue-400', label: '⚡ High Demand' },
-    'Medium': { color: '#f59e0b', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30', text: 'text-yellow-400', label: '💫 Medium Demand' },
-    'Low': { color: '#6b7280', bg: 'bg-gray-500/20', border: 'border-gray-500/30', text: 'text-gray-400', label: '💤 Low Demand' }
+// Receipt Card Component
+const ReceiptCard = ({ receipt, onView }: any) => {
+  const getReceiptIcon = (merchant: string) => {
+    const icons: any = {
+      'Target': '🎯',
+      'Costco': '🏪',
+      'Wingstop': '🍗',
+      'Walmart': '🛒',
+      'Whole Foods': '🥬',
+      'Starbucks': '☕',
+      'Apple Store': '🍎',
+      'CVS': '💊',
+      'Trader Joe\'s': '🛍️',
+      'McDonald\'s': '🍔'
+    };
+    return icons[merchant] || '🧾';
   };
 
-  const demandInfo = demandConfig[demand as keyof typeof demandConfig] || demandConfig['Medium'];
+  const getCategoryColor = (category: string) => {
+    const colors: any = {
+      'Grocery': '#10b981',
+      'Restaurant': '#f59e0b',
+      'Retail': '#3b82f6',
+      'Electronics': '#8b5cf6',
+      'Pharmacy': '#ec4899',
+      'Coffee': '#78350f'
+    };
+    return colors[category] || '#6b7280';
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      className="relative group"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -2 }}
+      className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4 hover:border-cyan-400/30 transition-all cursor-pointer group"
+      onClick={() => onView(receipt)}
     >
-      <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
-           style={{ background: `linear-gradient(135deg, ${color}20, ${color}40)` }}
-      />
-
-      <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 h-full overflow-hidden">
-        {/* Top glow line */}
-        <div className="absolute top-0 left-0 right-0 h-px"
-             style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
-        />
-
-        {/* Icon & Status */}
-        <div className="flex items-start justify-between mb-3">
-          <motion.div
-            animate={{ rotate: isHovered ? [0, 5, -5, 0] : 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl"
-          >
-            {icon}
-          </motion.div>
-
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            isConnected
-              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-              : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-          }`}>
-            {isConnected ? 'Connected' : 'Not Connected'}
-          </div>
-        </div>
-
-        {/* Demand Badge */}
-        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mb-3 ${demandInfo.bg} ${demandInfo.border} ${demandInfo.text} border`}>
-          {demandInfo.label}
-        </div>
-
-        {/* Content */}
-        <h3 className="text-lg font-bold text-white mb-2">{name}</h3>
-        <p className="text-gray-400 text-xs mb-4">{description}</p>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          {isConnected ? (
-            <>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onSync}
-                className="flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm"
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3 flex-1">
+          <div className="text-3xl">{getReceiptIcon(receipt.merchant)}</div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold text-white">{receipt.merchant}</h4>
+              {receipt.verified && (
+                <span className="text-green-400 text-xs">✓</span>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mb-2">{receipt.date} • {receipt.location}</p>
+            <div className="flex items-center gap-2">
+              <span
+                className="px-2 py-0.5 rounded-full text-xs font-medium border"
                 style={{
-                  background: `linear-gradient(135deg, ${color}40, ${color}60)`,
-                  color: 'white',
-                  border: `1px solid ${color}50`
+                  backgroundColor: `${getCategoryColor(receipt.category)}20`,
+                  borderColor: `${getCategoryColor(receipt.category)}40`,
+                  color: getCategoryColor(receipt.category)
                 }}
               >
-                Sync
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onDisconnect}
-                className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:border-red-500/30 transition-all duration-300 text-sm"
-              >
-                Disconnect
-              </motion.button>
-            </>
-          ) : (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onConnect}
-              className="w-full px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm"
-              style={{
-                background: `linear-gradient(135deg, ${color}40, ${color}60)`,
-                color: 'white',
-                border: `1px solid ${color}50`
-              }}
-            >
-              Connect
-            </motion.button>
-          )}
+                {receipt.category}
+              </span>
+              <span className="text-xs text-gray-500">${receipt.total}</span>
+            </div>
+          </div>
         </div>
-
-        {/* Corner accent */}
-        <motion.div
-          animate={{
-            opacity: isHovered ? 1 : 0,
-            scale: isHovered ? 1 : 0.8
-          }}
-          className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full blur-2xl"
-          style={{ background: `${color}20` }}
-        />
+        <div className="text-right">
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-bold text-green-400">${receipt.earnings}</span>
+            {receipt.multiplier > 1 && (
+              <span className="text-xs text-yellow-400">×{receipt.multiplier}</span>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">{receipt.status}</p>
+        </div>
       </div>
     </motion.div>
   );
 };
 
-// Stats card component
-const StatsCard = ({ label, value, icon, color }: any) => {
+// Stats Card
+const StatsCard = ({ label, value, icon, color, subtitle }: any) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.02 }}
-      className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-4 overflow-hidden group"
+      className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 overflow-hidden group"
     >
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
           <p className="text-gray-400 text-sm mb-1">{label}</p>
-          <p className="text-2xl font-bold text-white">{value}</p>
+          <p className="text-3xl font-bold text-white mb-1">{value}</p>
+          {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
         </div>
-        <div className="text-3xl opacity-50" style={{ color }}>
+        <div className="text-4xl opacity-50" style={{ color }}>
           {icon}
         </div>
       </div>
@@ -165,287 +115,138 @@ const StatsCard = ({ label, value, icon, color }: any) => {
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [showDataModal, setShowDataModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
   const [stats, setStats] = useState({
-    connected: 0,
-    totalData: '0',
-    earnings: '$0'
+    totalEarnings: 147.50,
+    thisMonth: 23.80,
+    receiptsUploaded: 234,
+    pendingReview: 3,
+    avgPerReceipt: 0.63
   });
 
-  const serviceCategories = {
-    'Music & Entertainment': [
-      {
-        name: 'Spotify',
-        provider: 'spotify',
-        icon: '🎵',
-        description: 'Music streaming & listening habits',
-        color: '#1DB954',
-        demand: 'High'
-      },
-      {
-        name: 'Netflix',
-        provider: 'netflix',
-        icon: '🎬',
-        description: 'Watch history & preferences',
-        color: '#E50914',
-        demand: 'High'
-      },
-      {
-        name: 'YouTube',
-        provider: 'youtube',
-        icon: '📺',
-        description: 'Video watch history & subscriptions',
-        color: '#FF0000',
-        demand: 'Very High'
-      },
-    ],
-    'Health & Fitness': [
-      {
-        name: 'Fitbit',
-        provider: 'fitbit',
-        icon: '⚡',
-        description: 'Activity, sleep & heart rate data',
-        color: '#00B0B9',
-        demand: 'Very High'
-      },
-      {
-        name: 'Apple Health',
-        provider: 'apple_health',
-        icon: '❤️',
-        description: 'Comprehensive health metrics',
-        color: '#FF3B30',
-        demand: 'Very High'
-      },
-      {
-        name: 'Oura Ring',
-        provider: 'oura',
-        icon: '💍',
-        description: 'Sleep & readiness tracking',
-        color: '#00D9FF',
-        demand: 'Medium'
-      },
-      {
-        name: 'Whoop',
-        provider: 'whoop',
-        icon: '📊',
-        description: 'Recovery & strain analytics',
-        color: '#FF3366',
-        demand: 'Medium'
-      },
-      {
-        name: 'Strava',
-        provider: 'strava',
-        icon: '🏃',
-        description: 'Running & cycling activities',
-        color: '#FC4C02',
-        demand: 'High'
-      },
-      {
-        name: 'MyFitnessPal',
-        provider: 'myfitnesspal',
-        icon: '🍎',
-        description: 'Nutrition & calorie tracking',
-        color: '#0072C6',
-        demand: 'High'
-      },
-    ],
-    'Social Media': [
-      {
-        name: 'Instagram',
-        provider: 'instagram',
-        icon: '📸',
-        description: 'Posts, stories & engagement data',
-        color: '#E1306C',
-        demand: 'Very High'
-      },
-      {
-        name: 'TikTok',
-        provider: 'tiktok',
-        icon: '🎵',
-        description: 'Video engagement & preferences',
-        color: '#000000',
-        demand: 'Very High'
-      },
-      {
-        name: 'Twitter/X',
-        provider: 'twitter',
-        icon: '🐦',
-        description: 'Tweets, likes & interactions',
-        color: '#1DA1F2',
-        demand: 'High'
-      },
-      {
-        name: 'LinkedIn',
-        provider: 'linkedin',
-        icon: '💼',
-        description: 'Professional network & activity',
-        color: '#0077B5',
-        demand: 'High'
-      },
-    ],
-    'Shopping & Travel': [
-      {
-        name: 'Amazon',
-        provider: 'amazon',
-        icon: '📦',
-        description: 'Purchase history & preferences',
-        color: '#FF9900',
-        demand: 'Very High'
-      },
-      {
-        name: 'Uber',
-        provider: 'uber',
-        icon: '🚗',
-        description: 'Ride history & location patterns',
-        color: '#000000',
-        demand: 'High'
-      },
-      {
-        name: 'DoorDash',
-        provider: 'doordash',
-        icon: '🍔',
-        description: 'Food delivery preferences',
-        color: '#FF3008',
-        demand: 'Medium'
-      },
-    ],
-    'Finance & Banking': [
-      {
-        name: 'Plaid',
-        provider: 'plaid',
-        icon: '💳',
-        description: 'Banking & transaction data',
-        color: '#00C9A7',
-        demand: 'Very High'
-      },
-      {
-        name: 'Venmo',
-        provider: 'venmo',
-        icon: '💸',
-        description: 'P2P payment patterns',
-        color: '#3D95CE',
-        demand: 'High'
-      },
-      {
-        name: 'PayPal',
-        provider: 'paypal',
-        icon: '💰',
-        description: 'Transaction & payment history',
-        color: '#003087',
-        demand: 'High'
-      },
-      {
-        name: 'Coinbase',
-        provider: 'coinbase',
-        icon: '₿',
-        description: 'Crypto trading & portfolio',
-        color: '#0052FF',
-        demand: 'Medium'
-      },
-    ],
-    'Productivity': [
-      {
-        name: 'Google Calendar',
-        provider: 'google',
-        icon: '📅',
-        description: 'Calendar & scheduling patterns',
-        color: '#4285F4',
-        demand: 'High'
-      },
-      {
-        name: 'Notion',
-        provider: 'notion',
-        icon: '📝',
-        description: 'Workspace & productivity data',
-        color: '#FFFFFF',
-        demand: 'Medium'
-      },
-      {
-        name: 'Slack',
-        provider: 'slack',
-        icon: '💬',
-        description: 'Communication patterns',
-        color: '#4A154B',
-        demand: 'Medium'
-      },
-      {
-        name: 'GitHub',
-        provider: 'github',
-        icon: '💻',
-        description: 'Code activity & contributions',
-        color: '#181717',
-        demand: 'Medium'
-      },
-      {
-        name: 'Trello',
-        provider: 'trello',
-        icon: '📋',
-        description: 'Task management & workflows',
-        color: '#0079BF',
-        demand: 'Low'
-      },
-    ],
-    'Gaming': [
-      {
-        name: 'Steam',
-        provider: 'steam',
-        icon: '🎮',
-        description: 'Gaming activity & preferences',
-        color: '#171A21',
-        demand: 'High'
-      },
-    ]
-  };
-
-  // Flatten all services for easy iteration
-  const serviceConfig = Object.values(serviceCategories).flat();
+  const [recentReceipts, setRecentReceipts] = useState([
+    {
+      id: 1,
+      merchant: 'Target',
+      category: 'Retail',
+      total: '89.47',
+      earnings: '0.15',
+      date: 'Today, 2:34 PM',
+      location: 'San Francisco, CA',
+      status: 'Verified',
+      verified: true,
+      multiplier: 1
+    },
+    {
+      id: 2,
+      merchant: 'Whole Foods',
+      category: 'Grocery',
+      total: '156.23',
+      earnings: '0.08',
+      date: 'Today, 11:20 AM',
+      location: 'San Francisco, CA',
+      status: 'Verified',
+      verified: true,
+      multiplier: 1
+    },
+    {
+      id: 3,
+      merchant: 'Apple Store',
+      category: 'Electronics',
+      total: '1,299.00',
+      earnings: '2.50',
+      date: 'Yesterday',
+      location: 'San Francisco, CA',
+      status: 'Verified',
+      verified: true,
+      multiplier: 2
+    },
+    {
+      id: 4,
+      merchant: 'Starbucks',
+      category: 'Coffee',
+      total: '12.45',
+      earnings: '0.03',
+      date: 'Yesterday',
+      location: 'San Francisco, CA',
+      status: 'Verified',
+      verified: true,
+      multiplier: 1
+    },
+    {
+      id: 5,
+      merchant: 'Costco',
+      category: 'Grocery',
+      total: '234.67',
+      earnings: '0.12',
+      date: '2 days ago',
+      location: 'San Francisco, CA',
+      status: 'Processing',
+      verified: false,
+      multiplier: 1
+    }
+  ]);
 
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
-    setUser({ email: 'demo@datahub.com' });
-    setServices([]);
-    setStats({
-      connected: 0,
-      totalData: '0',
-      earnings: '$0.00'
-    });
+    setUser({ email: 'demo@datahub.com', name: 'Demo User' });
     setLoading(false);
   };
 
-  const handleConnect = (provider: string) => {
-    setServices([...services, { provider, isActive: true }]);
-    setStats({
-      ...stats,
-      connected: stats.connected + 1,
-      totalData: `${(stats.connected + 1) * 1240}`
-    });
-    setSelectedService(provider);
-    setShowDataModal(true);
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+
+    // Simulate upload
+    setTimeout(() => {
+      const file = files[0];
+      const newReceipt = {
+        id: recentReceipts.length + 1,
+        merchant: 'Trader Joe\'s',
+        category: 'Grocery',
+        total: '67.89',
+        earnings: '0.09',
+        date: 'Just now',
+        location: 'San Francisco, CA',
+        status: 'Processing',
+        verified: false,
+        multiplier: 1
+      };
+
+      setRecentReceipts([newReceipt, ...recentReceipts]);
+      setStats({
+        ...stats,
+        receiptsUploaded: stats.receiptsUploaded + 1,
+        pendingReview: stats.pendingReview + 1
+      });
+      setUploading(false);
+    }, 1500);
   };
 
-  const handleDisconnect = async (provider: string) => {
-    setServices(services.filter(s => s.provider !== provider));
-    setStats({
-      ...stats,
-      connected: Math.max(0, stats.connected - 1),
-      totalData: `${Math.max(0, stats.connected - 1) * 1240}`
-    });
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
   };
 
-  const handleSync = async (provider: string) => {
-    setSelectedService(provider);
-    setShowDataModal(true);
-  };
-
-  const handleViewData = (provider: string) => {
-    setSelectedService(provider);
-    setShowDataModal(true);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files);
+    }
   };
 
   const handleLogout = () => {
@@ -465,19 +266,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
-      <DataModal
-        isOpen={showDataModal}
-        onClose={() => setShowDataModal(false)}
-        service={selectedService || ''}
-        data={{}}
-      />
-
-      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0a0a0a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0a0a0a] relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"
+          className="absolute top-0 right-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -485,7 +278,7 @@ export default function DashboardPage() {
           transition={{ duration: 10, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"
+          className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.5, 0.3, 0.5],
@@ -507,19 +300,22 @@ export default function DashboardPage() {
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  DataHub API
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent">
+                  ReceiptBank
                 </h1>
-                <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                  <span className="text-xs text-cyan-400 font-medium">Live</span>
+                <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-green-400 font-medium">Live</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="hidden md:block text-right">
-                  <p className="text-sm text-gray-400">Welcome back,</p>
-                  <p className="text-sm font-medium text-white">{user?.email}</p>
+                <div className="hidden md:flex items-center gap-3 px-4 py-2 backdrop-blur-xl bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <span className="text-2xl">💰</span>
+                  <div>
+                    <p className="text-xs text-gray-400">Total Earnings</p>
+                    <p className="text-lg font-bold text-green-400">${stats.totalEarnings.toFixed(2)}</p>
+                  </div>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -536,34 +332,125 @@ export default function DashboardPage() {
 
         {/* Main Content */}
         <main className="container mx-auto px-6 py-8">
-          {/* Stats Section */}
+          {/* Upload Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              className={`relative backdrop-blur-xl bg-gradient-to-r from-green-500/10 to-cyan-500/10 border-2 border-dashed rounded-2xl p-8 transition-all duration-300 ${
+                dragActive ? 'border-green-400 bg-green-500/20' : 'border-green-500/30 hover:border-green-400/50'
+              }`}
+            >
+              <div className="text-center">
+                <motion.div
+                  animate={{ y: uploading ? [0, -10, 0] : 0 }}
+                  transition={{ duration: 0.6, repeat: uploading ? Infinity : 0 }}
+                  className="text-6xl mb-4"
+                >
+                  {uploading ? '⏳' : '📸'}
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {uploading ? 'Processing Receipt...' : 'Upload Your Receipts'}
+                </h3>
+                <p className="text-gray-400 mb-6">
+                  Take a photo or upload receipt images • Earn $0.02-$2.50 per receipt
+                </p>
+
+                <div className="flex items-center justify-center gap-4">
+                  <motion.label
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-cyan-500 rounded-lg text-white font-semibold cursor-pointer hover:from-green-400 hover:to-cyan-400 transition-all"
+                  >
+                    📱 Take Photo / Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => handleFileUpload(e.target.files)}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </motion.label>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-8 py-3 bg-white/5 border border-white/10 rounded-lg text-white font-semibold hover:border-cyan-400/50 transition-all"
+                  >
+                    📂 Bulk Upload
+                  </motion.button>
+                </div>
+
+                <div className="mt-6 flex items-center justify-center gap-8 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span className="text-gray-400">Any Store</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span className="text-gray-400">Instant Processing</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span className="text-gray-400">Secure & Private</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Stats Grid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
           >
             <StatsCard
-              label="Connected Services"
-              value={stats.connected}
-              icon="🔗"
-              color="#00d9ff"
-            />
-            <StatsCard
-              label="Data Points"
-              value={stats.totalData}
-              icon="📊"
-              color="#0ea5e9"
-            />
-            <StatsCard
               label="Total Earnings"
-              value={stats.earnings}
+              value={`$${stats.totalEarnings.toFixed(2)}`}
               icon="💰"
               color="#10b981"
+              subtitle="All time"
+            />
+            <StatsCard
+              label="This Month"
+              value={`$${stats.thisMonth.toFixed(2)}`}
+              icon="📅"
+              color="#0ea5e9"
+              subtitle="+15.3% vs last month"
+            />
+            <StatsCard
+              label="Receipts"
+              value={stats.receiptsUploaded}
+              icon="🧾"
+              color="#8b5cf6"
+              subtitle="Total uploaded"
+            />
+            <StatsCard
+              label="Avg/Receipt"
+              value={`$${stats.avgPerReceipt.toFixed(2)}`}
+              icon="📊"
+              color="#f59e0b"
+              subtitle="Your average"
+            />
+            <StatsCard
+              label="Pending"
+              value={stats.pendingReview}
+              icon="⏳"
+              color="#6b7280"
+              subtitle="Being processed"
             />
           </motion.div>
 
-          {/* Services Section */}
+          {/* Recent Receipts */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -571,58 +458,37 @@ export default function DashboardPage() {
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1">Available Data Sources</h2>
-                <p className="text-gray-400 text-sm">26 integrations • Connect and monetize your data</p>
+                <h2 className="text-2xl font-bold text-white mb-1">Recent Receipts</h2>
+                <p className="text-gray-400 text-sm">Your latest uploads and earnings</p>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => loadData()}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
-              >
-                🔄 Refresh
-              </motion.button>
+              <div className="flex items-center gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => router.push('/analytics')}
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 rounded-lg text-cyan-400 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
+                >
+                  📈 View All
+                </motion.button>
+              </div>
             </div>
 
-            {/* Services grouped by category */}
-            {Object.entries(serviceCategories).map(([category, categoryServices], catIndex) => (
-              <div key={category} className="mb-8">
+            <div className="space-y-3">
+              {recentReceipts.map((receipt, index) => (
                 <motion.div
+                  key={receipt.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 * catIndex }}
-                  className="flex items-center gap-3 mb-4"
+                  transition={{ delay: 0.05 * index }}
                 >
-                  <h3 className="text-lg font-semibold text-white">{category}</h3>
-                  <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-xs text-cyan-400">
-                    {categoryServices.length} sources
-                  </span>
+                  <ReceiptCard
+                    receipt={receipt}
+                    onView={(r: any) => console.log('View receipt', r)}
+                  />
                 </motion.div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categoryServices.map((service: any, index: number) => {
-                    const isConnected = services.some(s => s.provider === service.provider);
-                    return (
-                      <motion.div
-                        key={service.provider}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05 * index }}
-                      >
-                        <ServiceCard
-                          {...service}
-                          isConnected={isConnected}
-                          onConnect={() => handleConnect(service.provider)}
-                          onDisconnect={() => handleDisconnect(service.provider)}
-                          onSync={() => handleSync(service.provider)}
-                        />
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </motion.div>
 
           {/* Quick Actions */}
@@ -630,83 +496,71 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mt-8 space-y-4"
+            className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4"
           >
-            {/* Featured: Data Packages */}
             <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => router.push('/packages')}
-              className="w-full p-6 backdrop-blur-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-2xl text-left group hover:border-green-400/50 transition-all duration-300"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/marketplace')}
+              className="p-6 backdrop-blur-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl text-left group hover:border-purple-400/50 transition-all duration-300"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center text-2xl">
-                    📦
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-green-400 group-hover:text-green-300 transition-colors">Data Packages</h3>
-                      <span className="px-2 py-0.5 bg-green-500/20 border border-green-500/30 rounded-full text-xs text-green-400 font-semibold">+50% Earnings</span>
-                    </div>
-                    <p className="text-gray-400 text-sm">Bundle your data sources for premium pricing • 6 curated packages available</p>
-                  </div>
-                </div>
-                <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+              <div className="text-2xl mb-2">🛒</div>
+              <h3 className="text-purple-400 font-semibold mb-1 group-hover:text-purple-300 transition-colors">Data Marketplace</h3>
+              <p className="text-gray-400 text-sm">See what companies are buying</p>
             </motion.button>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/autopilot')}
-                className="p-6 backdrop-blur-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl text-left group hover:border-cyan-400/50 transition-all duration-300"
-              >
-                <div className="text-2xl mb-2">⚡</div>
-                <h3 className="text-cyan-400 font-semibold mb-1 group-hover:text-cyan-300 transition-colors">Autopilot Mode</h3>
-                <p className="text-gray-400 text-sm">Auto-approve with smart rules</p>
-              </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/analytics')}
+              className="p-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl text-left group hover:border-cyan-400/30 transition-all duration-300"
+            >
+              <div className="text-2xl mb-2">📊</div>
+              <h3 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">Earnings Analytics</h3>
+              <p className="text-gray-400 text-sm">Track your income trends</p>
+            </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/marketplace')}
-                className="p-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl text-left group hover:border-cyan-400/30 transition-all duration-300"
-              >
-                <div className="text-2xl mb-2">🛒</div>
-                <h3 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">Marketplace</h3>
-                <p className="text-gray-400 text-sm">Browse data requests</p>
-              </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/enterprise')}
+              className="p-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl text-left group hover:border-cyan-400/30 transition-all duration-300"
+            >
+              <div className="text-2xl mb-2">🏢</div>
+              <h3 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">For Businesses</h3>
+              <p className="text-gray-400 text-sm">Buy receipt data</p>
+            </motion.button>
+          </motion.div>
 
+          {/* Value Indicator Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mt-8 p-6 backdrop-blur-xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl">💡</div>
+                <div>
+                  <h3 className="text-yellow-400 font-semibold mb-1">Receipt Value Guide</h3>
+                  <div className="text-sm text-gray-400 space-y-1">
+                    <p>📱 Electronics (Apple, Best Buy): $1.50-2.50 • 🛒 Retail (Target, Walmart): $0.08-0.15</p>
+                    <p>🥬 Grocery (Whole Foods, Costco): $0.08-0.12 • ☕ Coffee/Fast Food: $0.02-0.05</p>
+                  </div>
+                </div>
+              </div>
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/analytics')}
-                className="p-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl text-left group hover:border-cyan-400/30 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg text-yellow-400 font-semibold hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
               >
-                <div className="text-2xl mb-2">📈</div>
-                <h3 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">Analytics</h3>
-                <p className="text-gray-400 text-sm">View your insights</p>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/settings')}
-                className="p-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl text-left group hover:border-cyan-400/30 transition-all duration-300"
-              >
-                <div className="text-2xl mb-2">⚙️</div>
-                <h3 className="text-white font-semibold mb-1 group-hover:text-cyan-400 transition-colors">Settings</h3>
-                <p className="text-gray-400 text-sm">Manage account</p>
+                Learn More
               </motion.button>
             </div>
           </motion.div>
         </main>
       </div>
     </div>
-    </>
   );
 }
