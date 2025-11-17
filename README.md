@@ -113,8 +113,8 @@ Based on real market research:
 
 ```bash
 # Clone the repo
-git clone https://github.com/KushagraKanaujia/datahub.git
-cd datahub
+git clone https://github.com/KushagraKanaujia/receiptbank.git
+cd receiptbank
 
 # Install backend dependencies
 cd backend && npm install
@@ -222,7 +222,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📞 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/KushagraKanaujia/datahub/issues)
+- **Issues**: [GitHub Issues](https://github.com/KushagraKanaujia/receiptbank/issues)
 - **Email**: hello@receiptbank.com
 - **Twitter**: @receiptbank
 
