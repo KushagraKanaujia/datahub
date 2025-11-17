@@ -5,10 +5,29 @@
 ![ReceiptBank](https://img.shields.io/badge/ReceiptBank-Open%20Source-00d9ff?style=for-the-badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
+![Founding Contributors](https://img.shields.io/badge/Founding%20Contributors-0%2F10-red?style=for-the-badge)
 
 **Stop throwing away money. Turn your receipts into passive income.**
 
 </div>
+
+---
+
+## 🚨 We're Looking for Founding Contributors
+
+**First 10 developers to merge a PR get permanent founding contributor status.**
+
+**What you get:**
+- Your name in [CONTRIBUTORS.md](CONTRIBUTORS.md) forever
+- Founding Contributor badge
+- Priority PR reviews
+- Vote on project direction
+
+**Current spots:** 0/10 taken ⏰
+
+**See [Issues](https://github.com/KushagraKanaujia/receiptbank/issues) to claim your spot.**
+
+---
 
 ---
 
